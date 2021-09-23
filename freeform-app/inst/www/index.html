@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<meta charset='utf-8'>
+<html>
+<head>
+<style>
+#error {
+    color: red;
+}
+</style>
+<link rel="stylesheet" href="css/dataentrygrid.css">
+<link rel="stylesheet" href="css/shinylight.css">
+<link rel="icon" href="images/favicon.ico">
+<script src="js/dataentrygrid.min.js" type="text/javascript"></script>
+<script src="js/rrpc.min.js" type="text/javascript"></script>
+<script src="js/toolkit.js" type="text/javascript"></script>
+<script>
+var pchControl = null;
+var bgControl = null;
+var typeControl = null;
+var inputTable = null;
+var outputTable = null;
+function start() {
+    var parameterBox = document.getElementById('parameter_box');
+    pchControl = toolkit.paramInteger(
+        // id of the element to be returned
+        'pch',
+        // element in which the returned element should be put
+        parameterBox,
+        // label and hover text for the control
+        { name: 'Point type', help: 'Controls the look of the points in the plot' },
+        // initial value
+        '1'
+    );
+    bgControl = toolkit.paramColor(
+        // id of the element to be returned
+        'bg',// container
+        parameterBox,// label and hover text
+        {
+            name: 'Point colour',
+            help: 'Secondary colour for the points in the plot, if the point type ' +
+            'is between 21 and 25'
+        },
+        // initial value
+        '#808080'
+    );
+    var translations = {
+        'p': { name: 'points', help: 'Scatterplot' },
+        'l': { name: 'lines', help: 'Line Graph' },
+        'h': { name: 'histogram', help: 'Bar Graph' }
+    };
+    typeControl = toolkit.paramSelector(
+        // optional id for the element retuned
+        'graph_type',
+        // Element into which this new control should be placed. If
+        // null, the control will be returned and the caller will have
+        // to place it into the DOM.
+        parameterBox,
+        // label name and hover text
+        {
+            name: 'Graph Type',
+            help: 'The type of graph to plot'
+        },
+        // the values .getData() can return
+        ['p', 'l', 'h'],
+        // display values and hover texts for the options
+        translations,
+        // initial value
+        'p',
+        // callback for when the value changes
+        function() {
+            // for fun, we'll change the title of the graph when the type
+            // selector is changed
+            var plot_title = document.getElementById('plot_title');
+            // Elements returned by the toolkit.paramXXX functions
+            // have .hide(), .show(), .getData() and .setData(x) methods
+            // monkey patched onto them.
+            var v = typeControl.getData();
+            plot_title.textContent = translations[v];
+        }
+    );
+    inputTable = createDataEntryGrid(
+        // Table element (or id of table element in the DOM) that will
+        // be transformed into a Data Entry Grid
+        'input-table',
+        // column headers (or number of columns if you want
+        // column headers 'A', 'B', 'C', ... with the user able to
+        // add and delete columns at will)
+        ['x', 'y'],
+        // number of rows (or array of arrays of cells)
+        6
+    );
+    outputTable = createDataEntryGrid('output-table', 2, 6);
+    rrpc.initialize();
+}
+function plot() {
+    rrpc.call('makePlot', {
+        x: inputTable.getColumn(0).map(parseFloat),
+        y: inputTable.getColumn(1).map(parseFloat),
+        type: typeControl.getData(),
+        pch: pchControl.getData(),
+        bg: bgControl.getData(),
+        'rrpc.resultformat': {
+            type: 'png',
+            width: 400,
+            height: 600
+      }
+    }, function (result, error) {
+        if (error) {
+            document.getElementById('error').value = JSON.stringify(error);
+        }
+        if (result && typeof(result.plot) === 'object' && 0 in result.plot) {
+            document.getElementById('plot').setAttribute('src', result.plot[0]);
+            const t = toolkit.makeTable(result.data);
+            if (t) {
+                outputTable.init(t.headers, t.rows);
+            }
+        }
+    });
+}
+</script>
+</head>
+<main>
+<header>
+</header>
+<body onload="start()">
+    <div id="controls">
+        <div>
+            <div id="parameter_box"></div>
+            <button id="plot_button" onclick="plot()">Plot!</button>
+        </div>
+    </div>
+    <table id="input-table">
+    </table> 
+    <div id='plot_title'>Scatterplot</div>
+    <img id="plot">
+    <table id="output-table">
+    </table>
+    <textarea rows="5" cols="80" id="result"></textarea>
+    <textarea rows="5" cols="80" id="error"></textarea>
+</body>
+</main>
+</html>
