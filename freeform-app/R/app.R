@@ -6,7 +6,7 @@ makePlot <- function(x, y, type, pch, bg) {
   )
 }
 
-js2rServer <- function(port=NULL) {
+freeformServer <- function(port=NULL) {
   appDir <- R.utils::getAbsolutePath("freeform-app/inst/www")
   shinylight::slServer(host='0.0.0.0', port=port, appDir=appDir, daemonize=TRUE,
     interface=list(
@@ -15,4 +15,4 @@ js2rServer <- function(port=NULL) {
   )
 }
 
-js2rServer(8000)
+freeformServer(8000)

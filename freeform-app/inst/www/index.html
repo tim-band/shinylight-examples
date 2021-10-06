@@ -6,13 +6,24 @@
 #error {
     color: red;
 }
+#plot {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+}
+#output {
+    position: absolute;
+    width: 45%;
+    right: 0;
+}
 </style>
 <link rel="stylesheet" href="css/dataentrygrid.css">
 <link rel="stylesheet" href="css/shinylight.css">
 <link rel="icon" href="images/favicon.ico">
 <script src="js/dataentrygrid.min.js" type="text/javascript"></script>
 <script src="js/rrpc.min.js" type="text/javascript"></script>
-<script src="js/toolkit.js" type="text/javascript"></script>
+<script src="js/shinylight.js" type="text/javascript"></script>
+<script src="js/shinylight-toolkit.js" type="text/javascript"></script>
 <script>
 var pchControl = null;
 var bgControl = null;
@@ -70,12 +81,12 @@ function start() {
         function() {
             // for fun, we'll change the title of the graph when the type
             // selector is changed
-            var plot_title = document.getElementById('plot_title');
+            var plot_title = document.getElementById('plot-title');
             // Elements returned by the toolkit.paramXXX functions
             // have .hide(), .show(), .getData() and .setData(x) methods
             // monkey patched onto them.
             var v = typeControl.getData();
-            plot_title.textContent = translations[v];
+            plot_title.textContent = translations[v].help;
         }
     );
     inputTable = createDataEntryGrid(
@@ -90,31 +101,20 @@ function start() {
         6
     );
     outputTable = createDataEntryGrid('output-table', 2, 6);
-    rrpc.initialize();
+    shinylight.initialize();
 }
 function plot() {
-    rrpc.call('makePlot', {
+    shinylight.call('makePlot', {
         x: inputTable.getColumn(0).map(parseFloat),
         y: inputTable.getColumn(1).map(parseFloat),
         type: typeControl.getData(),
         pch: pchControl.getData(),
         bg: bgControl.getData(),
-        'rrpc.resultformat': {
-            type: 'png',
-            width: 400,
-            height: 600
-      }
-    }, function (result, error) {
-        if (error) {
-            document.getElementById('error').value = JSON.stringify(error);
-        }
-        if (result && typeof(result.plot) === 'object' && 0 in result.plot) {
-            document.getElementById('plot').setAttribute('src', result.plot[0]);
-            const t = toolkit.makeTable(result.data);
-            if (t) {
-                outputTable.init(t.headers, t.rows);
-            }
-        }
+    }, 'plot').then(function(result) {
+        shinylight.setElementPlot('plot', result);
+        shinylight.setGridResult(outputTable, result);
+    }).catch(function(error) {
+        shinylight.setElementText('error', error);
     });
 }
 </script>
@@ -131,12 +131,13 @@ function plot() {
     </div>
     <table id="input-table">
     </table> 
-    <div id='plot_title'>Scatterplot</div>
+    <div id='plot-title'>Scatterplot</div>
     <img id="plot">
-    <table id="output-table">
+    <div id="output">
+        <table id="output-table">
+        <textarea rows="5" cols="80" id="error"></textarea>
+    </div>
     </table>
-    <textarea rows="5" cols="80" id="result"></textarea>
-    <textarea rows="5" cols="80" id="error"></textarea>
 </body>
 </main>
 </html>

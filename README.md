@@ -25,7 +25,7 @@ install `shinylight` from github, then run the `run.R` script:
 
 ```sh
 Rscript -e "install.packages('remotes')"
-Rscript -e "remotes::install_github('tim-band/shinylight')"
+Rscript -e "remotes::install_github('tim-band/shinylight@v0.1')"
 Rscript framework-app/R/app.R
 ```
 
@@ -41,9 +41,14 @@ Again, start it like this:
 
 ```sh
 Rscript -e "install.packages('remotes')"
-Rscript -e "remotes::install_github('tim-band/shinylight')"
+Rscript -e "remotes::install_github('tim-band/shinylight@v0.1')"
 Rscript freeform-app/R/app.R
 ```
+
+This example also uses `shinylight-toolkit` for the creation of selection boxes
+and other controls. This gives some benefits (such as easy tooltip hovers,
+translations, validation and more) but is by no means necessary for using the
+`shinylight.runR` and `shinylight.call` functions.
 
 ## Constructing R in JavaScript on the client side
 
@@ -64,7 +69,7 @@ Again, start it like this:
 
 ```sh
 Rscript -e "install.packages('remotes')"
-Rscript -e "remotes::install_github('tim-band/shinylight')"
+Rscript -e "remotes::install_github('tim-band/shinylight@v0.1')"
 Rscript js-to-r-app/R/app.R
 ```
 
