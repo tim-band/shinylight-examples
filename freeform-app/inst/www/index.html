@@ -16,6 +16,13 @@
     width: 45%;
     right: 0;
 }
+#status {
+    width: 100%;
+    height: 24px;
+    left: 0;
+    color: white;
+    background-color: gray;
+}
 </style>
 <link rel="stylesheet" href="css/dataentrygrid.css">
 <link rel="stylesheet" href="css/shinylight.css">
@@ -103,6 +110,17 @@ function start() {
     outputTable = createDataEntryGrid('output-table', 2, 6);
     shinylight.initialize();
 }
+function showInfoText(text) {
+    document.getElementById('status').textContent = text;
+}
+function showProgressBar(numerator, denominator) {
+    var pc = Math.ceil(numerator * 100 / denominator);
+    document.getElementById('status').style.background
+        = "linear-gradient(to right, green 0% "+ pc + "%, grey " + pc + "% 100%)";
+}
+function hideProgressBar() {
+    showProgressBar(0, 1);
+}
 function plot() {
     shinylight.call('makePlot', {
         x: inputTable.getColumn(0).map(parseFloat),
@@ -110,11 +128,18 @@ function plot() {
         type: typeControl.getData(),
         pch: pchControl.getData(),
         bg: bgControl.getData(),
-    }, 'plot').then(function(result) {
+    }, 'plot', {
+        imgType: 'svg',  // or 'png' if you prefer
+        info: showInfoText,
+        progress: showProgressBar,
+    }).then(function(result) {
         shinylight.setElementPlot('plot', result);
         shinylight.setGridResult(outputTable, result);
     }).catch(function(error) {
         shinylight.setElementText('error', error);
+    }).finally(function() {
+        showInfoText('');
+        hideProgressBar();
     });
 }
 </script>
@@ -130,8 +155,10 @@ function plot() {
         </div>
     </div>
     <table id="input-table">
-    </table> 
-    <div id='plot-title'>Scatterplot</div>
+    </table>
+    <div id="status">
+    </div>
+    <div id="plot-title">Scatterplot</div>
     <img id="plot">
     <div id="output">
         <table id="output-table">
