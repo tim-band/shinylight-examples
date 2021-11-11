@@ -93,8 +93,16 @@ examples <- list(
   test1_weight_inits=list(4.4, 4.2, 6.1, 1.0)
 )
 
-frameworkServer <- function(port=NULL) {
-  shinylight::slServer(host='0.0.0.0', port=port, daemonize=TRUE,
+# Set host='0.0.0.0' if running inside a docker container
+frameworkServer <- function(port=NULL, host='127.0.0.1') {
+  shinylight::slServer(
+    host=host,
+    port=port,
+    # A user running withinR will not set a port and we will return control
+    # to them, so we set daemonize=FALSE. A script starting a server will
+    # set a port and will not want this function to exit, so we set
+    # daemonize=TRUE
+    daemonize=!is.null(port),
     interface=list(
       test1=test1,
       test2=test2,
@@ -106,4 +114,4 @@ frameworkServer <- function(port=NULL) {
   )
 }
 
-frameworkServer(8000)
+frameworkServer(8001)

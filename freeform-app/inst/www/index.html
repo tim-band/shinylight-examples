@@ -38,6 +38,7 @@ var typeControl = null;
 var inputTable = null;
 var outputTable = null;
 function start() {
+    // Let's add some controls to the parameter box
     var parameterBox = document.getElementById('parameter_box');
     pchControl = toolkit.paramInteger(
         // id of the element to be returned
@@ -105,8 +106,15 @@ function start() {
         // add and delete columns at will)
         ['x', 'y'],
         // number of rows (or array of arrays of cells)
-        6
-    );
+        [
+            [1,5],
+            [2,4],
+            [3,3],
+            [4,1],
+            [5,2],
+            []
+        ]
+        );
     outputTable = createDataEntryGrid('output-table', 2, 6);
     shinylight.initialize();
 }
