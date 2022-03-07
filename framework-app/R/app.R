@@ -60,10 +60,6 @@ optiongroups <- list(
 )
 
 types <- list(
-  plot_type=list(
-    kind="enum",
-    values=c("p", "l", "h")
-  ),
   length_column=list(
     kind="column",
     subtype="f",
@@ -83,6 +79,12 @@ types <- list(
     kind="enum",
     values=c("kg", "lb"),
     factors=c(0.454, 1)
+  ),
+  # We can put an enum type into a structure by using list() instead of
+  # c() for any level that contains submenus.
+  plot_type=list(
+    kind="enum",
+    values=list(p="p", lines=c("l", "s", "b"), h="h")
   )
 )
 
@@ -107,8 +109,21 @@ frameworkServer <- function(port=NULL, host='127.0.0.1') {
       test1=test1,
       test2=test2,
       getSchema=function() {
-        list(functions=functions, params=params, types=types,
-          data=examples, optiongroups=optiongroups)
+        list(
+          # functiongroups is optional, only required if you want your function
+          # menu to have a cascading structure. Miss it out and it will be flat.
+          functiongroups=list(
+            # The name here is irrelevant, but you must have a name to ensure
+            # that the functions come out in the right order.
+            dummy1="test1",
+            dummy2="test2",
+            # The name here is relevant as it will be used to find a translation
+            # of the cascade in app.json
+            cascade=c("test1", "test2", "test2")
+          ),
+          functions=functions, params=params, types=types,
+          data=examples, optiongroups=optiongroups
+        )
       }
     )
   )

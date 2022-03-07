@@ -25,7 +25,7 @@ install `shinylight` from github, then run the `run.R` script:
 
 ```sh
 Rscript -e "install.packages('remotes')"
-Rscript -e "remotes::install_github('tim-band/shinylight@v0.1')"
+Rscript -e "remotes::install_github('tim-band/shinylight@v0.6')"
 Rscript framework-app/R/app.R
 ```
 
@@ -41,7 +41,7 @@ Again, start it like this:
 
 ```sh
 Rscript -e "install.packages('remotes')"
-Rscript -e "remotes::install_github('tim-band/shinylight@v0.1')"
+Rscript -e "remotes::install_github('tim-band/shinylight@v0.6')"
 Rscript freeform-app/R/app.R
 ```
 
@@ -69,7 +69,7 @@ Again, start it like this:
 
 ```sh
 Rscript -e "install.packages('remotes')"
-Rscript -e "remotes::install_github('tim-band/shinylight@v0.1')"
+Rscript -e "remotes::install_github('tim-band/shinylight@v0.6')"
 Rscript js-to-r-app/R/app.R
 ```
 
